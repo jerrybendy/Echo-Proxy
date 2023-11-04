@@ -1,21 +1,32 @@
-<script lang="ts" setup>
-import HelloWorld from './components/HelloWorld.vue'</script>
 
 <template>
-  <img id="logo" alt="Wails logo" src="./assets/images/logo-universal.png"/>
-  <HelloWorld/>
+  <NConfigProvider :theme="theme" style="height: 100%">
+    <NGlobalStyle />
+
+    <NCard :bordered="false" style="height: 100%">
+      <NTabs type="line" animated style="height: 100%" pane-wrapper-style="flex: 1" pane-style="height: calc(100% - var(--n-pane-padding-top))">
+        <NTabPane name="hosts" tab="Hosts">
+          <Hosts />
+        </NTabPane>
+        <NTabPane name="settings" tab="Settings">
+          Settings
+        </NTabPane>
+      </NTabs>
+    </NCard>
+
+
+  </NConfigProvider>
 </template>
 
-<style>
-#logo {
-  display: block;
-  width: 50%;
-  height: 50%;
-  margin: auto;
-  padding: 10% 0 0;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-origin: content-box;
-}
-</style>
+<script setup lang="ts">
+  import {computed} from "vue"
+  import {NConfigProvider, NGlobalStyle, useOsTheme, darkTheme, NCard, NTabs, NTabPane} from "naive-ui"
+  import Hosts from "./tabHosts/Hosts.vue";
+
+  const osThemeRef = useOsTheme()
+
+  const theme = computed(() => {
+    return osThemeRef.value === 'dark' ? darkTheme : null
+  })
+
+</script>
