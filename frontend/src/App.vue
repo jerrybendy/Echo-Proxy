@@ -2,9 +2,14 @@
 <template>
   <NConfigProvider :theme="theme" style="height: 100%">
     <NGlobalStyle />
+    <NNotificationProvider>
+      <GlobalEvents />
+    </NNotificationProvider>
 
     <NCard :bordered="false" style="height: 100%">
-      <NTabs type="line" animated style="height: 100%" pane-wrapper-style="flex: 1" pane-style="height: calc(100% - var(--n-pane-padding-top))">
+      <NTabs type="line" animated style="height: 100%" placement="left"
+             pane-wrapper-style="flex: 1" pane-style="height: calc(100% - var(--n-pane-padding-top))"
+      >
         <NTabPane name="hosts" tab="Hosts">
           <Hosts />
         </NTabPane>
@@ -20,13 +25,13 @@
 
 <script setup lang="ts">
   import {computed} from "vue"
-  import {NConfigProvider, NGlobalStyle, useOsTheme, darkTheme, NCard, NTabs, NTabPane} from "naive-ui"
+  import {NConfigProvider, NGlobalStyle, useOsTheme, darkTheme, NCard, NTabs, NTabPane, NNotificationProvider} from "naive-ui"
   import Hosts from "./tabHosts/Hosts.vue";
+  import GlobalEvents from "./components/GlobalEvents.vue";
 
   const osThemeRef = useOsTheme()
 
   const theme = computed(() => {
     return osThemeRef.value === 'dark' ? darkTheme : null
   })
-
 </script>

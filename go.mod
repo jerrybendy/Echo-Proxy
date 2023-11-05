@@ -1,4 +1,4 @@
-module changeme
+module localProxy
 
 go 1.18
 

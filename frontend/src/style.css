@@ -4,14 +4,23 @@ html, body, #app {
 
 body {
     margin: 0;
-
-    /*font-family: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",*/
-    /*"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",*/
-    /*sans-serif;*/
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
 }
 
+input, textarea {
+    --wails-draggable: no-drag;
+}
 
-/*#app {*/
-/*    height: 100vh;*/
-/*    text-align: center;*/
-/*}*/
+.n-tabs .n-tabs-nav.n-tabs-nav--line-type.n-tabs-nav--left .n-tabs-nav-scroll-content {
+    min-height: 100%;
+}
+
+.n-data-table-tr.selected, .n-data-table-tr.selected .n-data-table-td {
+    background-color: rgba(237, 245, 254, 1) !important;
+}
+@media screen and (prefers-color-scheme: dark) {
+    .n-data-table-tr.selected, .n-data-table-tr.selected .n-data-table-td {
+        background-color: rgba(56, 137, 197, 0.25) !important;
+    }
+}
