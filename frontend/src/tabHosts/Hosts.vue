@@ -2,7 +2,13 @@
   <div class="hosts-container">
     <div class="table-container" @click="onTableClick">
       <div class="toolbar">
-        <NButton type="primary" size="small" @click="createEmptyHost"><NIcon><Add/></NIcon>Create</NButton>
+        <NButton type="primary" size="small" @click="createEmptyHost"><NIcon><Add/></NIcon> Create</NButton>
+        <NButton style="margin-left: auto;" @click="startServer">
+          <template #icon>
+            <n-icon><Power /></n-icon>
+          </template>
+          Start server
+        </NButton>
       </div>
       <NDataTable
           :columns="columns"
@@ -29,10 +35,11 @@
 import {computed, h, onBeforeUnmount, onMounted, ref} from 'vue'
 import {userData} from "../../wailsjs/go/models";
 import {DataTableColumn, NButton, NCheckbox, NDataTable, NIcon, NDrawer, NDrawerContent} from "naive-ui";
-import {Add} from "@vicons/ionicons5";
+import {Add, Power} from "@vicons/ionicons5";
 import {GetHosts} from "../../wailsjs/go/userData/Hosts";
 import HostsSettings from "./HostsSettings.vue";
 import {EventsOff, EventsOn} from "../../wailsjs/runtime";
+import {StartServer} from "../../wailsjs/go/userData/Service";
 
 const data = ref<userData.HostConfig[]>([])
 const selectedHostId = ref<number>(0)
@@ -97,6 +104,10 @@ function onTableClick(event :MouseEvent) {
     currentNode = currentNode.parentNode as HTMLElement
   }
 }
+
+async function startServer() {
+  await StartServer()
+}
 </script>
 
 <style scoped>
@@ -113,6 +124,8 @@ function onTableClick(event :MouseEvent) {
 }
 
 .toolbar {
+  display: flex;
+  align-items: center;
   padding: 0 4px 12px;
 }
 </style>

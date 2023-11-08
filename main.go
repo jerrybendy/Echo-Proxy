@@ -16,7 +16,6 @@ var assets embed.FS
 
 func main() {
 	// Create an instance of the app structure
-	app := NewApp()
 
 	// Create application with options
 	err := wails.Run(&options.App{
@@ -43,12 +42,11 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
 		OnStartup: func(ctx context.Context) {
-			app.startup(ctx)
 			userData.Init(ctx)
 		},
 		Bind: []interface{}{
-			app,
 			&userData.Hosts{},
+			&userData.Service{},
 		},
 	})
 

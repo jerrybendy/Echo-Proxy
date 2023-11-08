@@ -6,6 +6,10 @@ export function GetHosts() {
   return window['go']['userData']['Hosts']['GetHosts']();
 }
 
+export function RemoveHost(arg1) {
+  return window['go']['userData']['Hosts']['RemoveHost'](arg1);
+}
+
 export function SaveSetting(arg1) {
   return window['go']['userData']['Hosts']['SaveSetting'](arg1);
 }

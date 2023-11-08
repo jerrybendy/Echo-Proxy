@@ -67,14 +67,18 @@ func saveConfig() {
 	go func() {
 		content, err := json.Marshal(config)
 		if err != nil {
-			runtime.EventsEmit(runtimeCtx, "error", "Encode config failed, "+err.Error())
+			emitErrorToFrontend("Encode config failed, " + err.Error())
 			return
 		}
 		err = os.WriteFile(configFilePath, content, 0755)
 		if err != nil {
-			runtime.EventsEmit(runtimeCtx, "error", "Save config failed, "+err.Error())
+			emitErrorToFrontend("Save config failed, " + err.Error())
 			return
 		}
 		runtime.EventsEmit(runtimeCtx, "hostsChange")
 	}()
+}
+
+func emitErrorToFrontend(errorMessage string) {
+	runtime.EventsEmit(runtimeCtx, "error", errorMessage)
 }

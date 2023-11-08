@@ -4,4 +4,6 @@ import {userData} from '../models';
 
 export function GetHosts():Promise<Array<userData.HostConfig>>;
 
+export function RemoveHost(arg1:number):Promise<void>;
+
 export function SaveSetting(arg1:userData.HostConfig):Promise<void>;

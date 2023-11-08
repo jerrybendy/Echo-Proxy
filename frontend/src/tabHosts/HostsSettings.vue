@@ -1,5 +1,5 @@
 <template>
-  <NDrawerContent title="Edit" closable :native-scrollbar="false">
+  <NDrawerContent title="Edit" closable :native-scrollbar="false" footer-style="justify-content: flex-start">
     <NForm
         ref="formRef"
         :model="model"
@@ -20,16 +20,26 @@
     </NForm>
 
     <template #footer>
-      <NButton type="primary" secondary @click="saveSetting">Save</NButton>
+      <NPopconfirm
+          :negative-button-props="{type: 'error', ghost: true} as ButtonProps"
+          :positive-button-props="{type: 'error'} as ButtonProps"
+          @positiveClick="removeHost"
+      >
+        <template #trigger>
+          <NButton type="error" secondary>Delete</NButton>
+        </template>
+        Do you confirm to remove this host?<br/> This operation can not be revoked!
+      </NPopconfirm>
+      <NButton type="primary" secondary style="margin-left: auto;" @click="saveSetting">Save</NButton>
     </template>
   </NDrawerContent>
 </template>
 
 <script setup lang="ts">
 import {ref, watchEffect, PropType, readonly} from 'vue'
-import {FormRules, NCard, NCheckbox, NForm, NFormItem, NInput, NButton, NDrawerContent, FormInst} from 'naive-ui'
+import {FormRules, NCard, NCheckbox, NForm, NFormItem, NInput, NButton, NDrawerContent, FormInst, NPopconfirm, ButtonProps} from 'naive-ui'
 import {userData} from "../../wailsjs/go/models";
-import {SaveSetting} from "../../wailsjs/go/userData/Hosts";
+import {RemoveHost, SaveSetting} from "../../wailsjs/go/userData/Hosts";
 
 const props = defineProps({
   host: {
@@ -76,6 +86,11 @@ async function saveSetting(e: MouseEvent) {
       console.log(errors)
     }
   })
+}
+
+async function removeHost() {
+  await RemoveHost(model.value.id)
+  emit('change')
 }
 
 </script>

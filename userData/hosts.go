@@ -26,3 +26,14 @@ func (h *Hosts) SaveSetting(setting HostConfig) {
 	}
 	saveConfig()
 }
+
+func (h *Hosts) RemoveHost(id int64) {
+	newHosts := make([]*HostConfig, 0, len(config.Hosts))
+	for _, item := range config.Hosts {
+		if item.ID != id {
+			newHosts = append(newHosts, item)
+		}
+	}
+	config.Hosts = newHosts
+	saveConfig()
+}
