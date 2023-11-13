@@ -18,4 +18,14 @@ EventsOn('error', function (errorMessage) {
   })
 })
 
+EventsOn('warning', function (errorMessage) {
+  console.warn(errorMessage);
+  notification.warning({
+    content: 'Warning',
+    meta: errorMessage,
+    duration: 3000,
+    keepAliveOnHover: true,
+  })
+})
+
 </script>

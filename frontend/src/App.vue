@@ -2,7 +2,7 @@
 <template>
   <NConfigProvider :theme="theme" style="height: 100%">
     <NGlobalStyle />
-    <NNotificationProvider>
+    <NNotificationProvider placement="top-left">
       <GlobalEvents />
     </NNotificationProvider>
 

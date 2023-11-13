@@ -4,7 +4,7 @@ import (
 	"context"
 	"embed"
 	"github.com/wailsapp/wails/v2/pkg/options/mac"
-	"localProxy/userData"
+	"localProxy/service"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -19,7 +19,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:     userData.AppName,
+		Title:     service.AppName,
 		Width:     1024,
 		Height:    768,
 		MinWidth:  800,
@@ -32,7 +32,7 @@ func main() {
 				FullSizeContent:            false,
 			},
 			About: &mac.AboutInfo{
-				Title:   userData.AppName,
+				Title:   service.AppName,
 				Message: "© 2023 Jerry Bendy",
 				Icon:    nil,
 			},
@@ -42,11 +42,11 @@ func main() {
 		},
 		BackgroundColour: &options.RGBA{R: 255, G: 255, B: 255, A: 1},
 		OnStartup: func(ctx context.Context) {
-			userData.Init(ctx)
+			service.Init(ctx)
 		},
 		Bind: []interface{}{
-			&userData.Hosts{},
-			&userData.Service{},
+			&service.Hosts{},
+			&service.Service{},
 		},
 	})
 

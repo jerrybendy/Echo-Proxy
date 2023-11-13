@@ -1,4 +1,4 @@
-package userData
+package service
 
 import (
 	"context"
@@ -81,4 +81,8 @@ func saveConfig() {
 
 func emitErrorToFrontend(errorMessage string) {
 	runtime.EventsEmit(runtimeCtx, "error", errorMessage)
+}
+
+func emitWarningToFrontend(errorMessage string) {
+	runtime.EventsEmit(runtimeCtx, "warning", errorMessage)
 }

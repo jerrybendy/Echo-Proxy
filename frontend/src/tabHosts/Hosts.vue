@@ -3,12 +3,9 @@
     <div class="table-container" @click="onTableClick">
       <div class="toolbar">
         <NButton type="primary" size="small" @click="createEmptyHost"><NIcon><Add/></NIcon> Create</NButton>
-        <NButton style="margin-left: auto;" @click="startServer">
-          <template #icon>
-            <n-icon><Power /></n-icon>
-          </template>
-          Start server
-        </NButton>
+        <NMessageProvider>
+          <ServerStatusButton />
+        </NMessageProvider>
       </div>
       <NDataTable
           :columns="columns"
@@ -33,20 +30,24 @@
 
 <script setup lang="ts">
 import {computed, h, onBeforeUnmount, onMounted, ref} from 'vue'
-import {userData} from "../../wailsjs/go/models";
-import {DataTableColumn, NButton, NCheckbox, NDataTable, NIcon, NDrawer, NDrawerContent} from "naive-ui";
-import {Add, Power} from "@vicons/ionicons5";
-import {GetHosts} from "../../wailsjs/go/userData/Hosts";
+import {service} from "../../wailsjs/go/models";
+import {DataTableColumn, NButton, NCheckbox, NDataTable, NIcon, NDrawer, NMessageProvider} from "naive-ui";
+import {Add} from "@vicons/ionicons5";
+import {GetHosts} from "../../wailsjs/go/service/Hosts";
 import HostsSettings from "./HostsSettings.vue";
 import {EventsOff, EventsOn} from "../../wailsjs/runtime";
-import {StartServer} from "../../wailsjs/go/userData/Service";
+import ServerStatusButton from "../components/ServerStatusButton.vue";
 
-const data = ref<userData.HostConfig[]>([])
+const data = ref<service.HostConfig[]>([])
 const selectedHostId = ref<number>(0)
 const columns: DataTableColumn[] = [
   {
     title: 'Name',
     key: 'name',
+  },
+  {
+    title: 'Default target',
+    key: 'defaultTarget',
   },
   {
     title: 'hosts file',
@@ -55,6 +56,17 @@ const columns: DataTableColumn[] = [
     render(row) {
       return h(NCheckbox, {
         checked: row.applyHosts as boolean,
+        size: "small",
+      })
+    }
+  },
+  {
+    title: 'TLS',
+    key: 'enableTLS',
+    align: "center",
+    render(row) {
+      return h(NCheckbox, {
+        checked: row.enableTLS as boolean,
         size: "small",
       })
     }
@@ -72,7 +84,7 @@ onBeforeUnmount(() => {
   EventsOff('hostsChange')
 })
 
-const selectedHost = computed<userData.HostConfig | null>(() => {
+const selectedHost = computed<service.HostConfig | null>(() => {
   return data.value.find(item => item.id === selectedHostId.value) || null
 })
 
@@ -85,7 +97,7 @@ async function createEmptyHost() {
   isShowEditDrawer.value = true
 }
 
-function rowClassName(row :userData.HostConfig) :string {
+function rowClassName(row :service.HostConfig) :string {
   const baseName = `host-id-${row.id} `
   return baseName + (row.id === selectedHostId.value ? 'selected' : '')
 }
@@ -105,9 +117,7 @@ function onTableClick(event :MouseEvent) {
   }
 }
 
-async function startServer() {
-  await StartServer()
-}
+
 </script>
 
 <style scoped>
