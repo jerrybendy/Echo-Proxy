@@ -9,5 +9,12 @@
   "author": {
     "name": "Jerry Bendy",
     "email": "jerry@icewingcc.com"
+  },
+  "info": {
+    "companyName": "icewingcc",
+    "productName": "Local Proxy",
+    "productVersion": "0.1.0",
+    "copyright": "© 2023 Jerry Bendy",
+    "comments": "A local reverse proxy tool"
   }
 }

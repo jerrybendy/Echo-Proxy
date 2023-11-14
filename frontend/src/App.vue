@@ -13,11 +13,14 @@
           :collapsed-width="64"
           :width="240"
           show-trigger
+          v-model:collapsed="menuCollapsed"
+          @update:collapsed="onMenuCollapsedChange"
       >
         <NMenu
             :value="currentMenu"
             :collapsed-width="64"
             :collapsed-icon-size="22"
+            :collapsed="menuCollapsed"
             :options="menuOptions"
         />
       </NLayoutSider>
@@ -32,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-  import {computed, Component, h, ref, watch} from "vue"
+  import {computed, Component, h, ref, watch, onBeforeMount} from "vue"
   import {RouterLink, useRoute} from "vue-router";
   import {
     NConfigProvider,
@@ -53,6 +56,12 @@
   const osThemeRef = useOsTheme()
   const route = useRoute()
   const currentMenu = ref("")
+  const menuCollapsed = ref(false)
+
+  onBeforeMount(() => {
+    const defaultMenuCollapsed = +(window.localStorage.getItem('defaultMenuCollapsed') || '0')
+    menuCollapsed.value = !!defaultMenuCollapsed
+  })
 
   const theme = computed(() => {
     return osThemeRef.value === 'dark' ? darkTheme : null
@@ -60,7 +69,7 @@
 
   watch(route, (newRoute) => {
     currentMenu.value = newRoute.name as string || ''
-  })
+  }, {immediate: true})
 
   const menuOptions: MenuOption[] = [
     {
@@ -74,6 +83,11 @@
       icon: renderIcon(SettingsSharp)
     },
   ]
+
+  function onMenuCollapsedChange(collapsed: boolean) {
+    window.localStorage.setItem('defaultMenuCollapsed', collapsed ? '1' : '0')
+    console.log(collapsed)
+  }
 
   function renderIcon (icon: Component) {
     return () => h(NIcon, null, { default: () => h(icon) })

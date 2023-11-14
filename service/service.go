@@ -172,6 +172,12 @@ func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 
 func (s *Service) startTlsServer(wg *sync.WaitGroup) {
 	tlsConfig := s.loadTLSConfig()
+	// Skip TLS server when no certificate available
+	if len(tlsConfig.Certificates) == 0 {
+		s.tlsServerRunning = false
+		return
+	}
+
 	s.tlsServer = &http.Server{
 		Addr:           ":443",
 		TLSConfig:      tlsConfig,
