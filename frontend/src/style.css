@@ -12,10 +12,6 @@ input, textarea {
     --wails-draggable: no-drag;
 }
 
-.n-tabs .n-tabs-nav.n-tabs-nav--line-type.n-tabs-nav--left .n-tabs-nav-scroll-content {
-    min-height: 100%;
-}
-
 .n-data-table-tr.selected, .n-data-table-tr.selected .n-data-table-td {
     background-color: rgba(237, 245, 254, 1) !important;
 }
