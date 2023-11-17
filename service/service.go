@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"errors"
 	"fmt"
-	"localProxy/hostsFile"
+	"github.com/spf13/cast"
 	"log"
 	"net"
 	"net/http"
@@ -29,17 +29,11 @@ type Service struct {
 }
 
 func (s *Service) StartServer() bool {
-	isPrivileged, err := hostsFile.IsPrivileged()
-	if err != nil {
-		emitErrorToFrontend(err.Error())
-		return false
-	}
-
-	if !isPrivileged {
-		emitWarningToFrontend("You are not running with root/administrator permissions, `apply to /etc/hosts` is skipped!")
-	} else {
-		// TODO change the /etc/hosts file
-	}
+	go func() {
+		if err := addHostsFileRecord(); err != nil {
+			emitErrorToFrontend(err.Error())
+		}
+	}()
 
 	s.makeTargetMap()
 
@@ -92,10 +86,11 @@ func (s *Service) ShutdownServer() {
 		s.tlsServerRunning = false
 	}
 
-	isPrivileged, _ := hostsFile.IsPrivileged()
-	if isPrivileged {
-		// TODO change the /etc/hosts file
-	}
+	go func() {
+		if err := removeHostsFileRecord(); err != nil {
+			emitErrorToFrontend(err.Error())
+		}
+	}()
 }
 
 func (s *Service) GetServerStatus() map[string]bool {
@@ -149,7 +144,7 @@ func (s *Service) makeTargetMap() {
 
 func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 	s.httpServer = &http.Server{
-		Addr:           ":80",
+		Addr:           ":" + cast.ToString(config.Setting.HttpPort),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -159,6 +154,7 @@ func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 	listener, err := net.Listen("tcp", s.httpServer.Addr)
 	if err != nil {
 		emitErrorToFrontend(err.Error())
+		wg.Done()
 		return
 	}
 	s.httpServerRunning = true
@@ -175,20 +171,22 @@ func (s *Service) startTlsServer(wg *sync.WaitGroup) {
 	// Skip TLS server when no certificate available
 	if len(tlsConfig.Certificates) == 0 {
 		s.tlsServerRunning = false
+		wg.Done()
 		return
 	}
 
 	s.tlsServer = &http.Server{
-		Addr:           ":443",
+		Addr:           ":" + cast.ToString(config.Setting.HttpsPort),
 		TLSConfig:      tlsConfig,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
 		Handler:        s.proxy,
 	}
-	listener, err := tls.Listen("tcp", ":443", tlsConfig)
+	listener, err := tls.Listen("tcp", s.tlsServer.Addr, tlsConfig)
 	if err != nil {
 		emitErrorToFrontend(err.Error())
+		wg.Done()
 		return
 	}
 	s.tlsServerRunning = true

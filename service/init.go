@@ -15,7 +15,8 @@ var configFilePath string
 var config *configFile
 
 type configFile struct {
-	Hosts []*HostConfig `json:"hosts"`
+	Hosts   []*HostConfig `json:"hosts"`
+	Setting Setting       `json:"setting"`
 }
 
 var runtimeCtx context.Context

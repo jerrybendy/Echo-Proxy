@@ -27,7 +27,9 @@
 
       <NLayout :native-scrollbar="false" style="height: 100%">
         <div style="padding: 12px; min-height: calc(100% - 24px)">
-          <router-view />
+          <NMessageProvider>
+            <router-view />
+          </NMessageProvider>
         </div>
       </NLayout>
     </NLayout>
@@ -47,7 +49,8 @@
     NLayout,
     NLayoutSider,
     NMenu,
-    MenuOption
+    MenuOption,
+    NMessageProvider
   } from "naive-ui"
   import Hosts from "./pages/Hosts.vue";
   import {Home, SettingsSharp} from "@vicons/ionicons5"

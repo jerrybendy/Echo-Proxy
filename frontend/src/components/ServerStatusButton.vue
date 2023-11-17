@@ -4,6 +4,7 @@
         :loading="loading"
         :type="isRunning ? 'success' : 'default'"
         :ghost="isRunning"
+        :focusable="false"
         @click="toggleServer"
     >
       <template #icon>

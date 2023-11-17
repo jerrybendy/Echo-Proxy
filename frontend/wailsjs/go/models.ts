@@ -24,6 +24,20 @@ export namespace service {
 	        this.TLSKeyFile = source["TLSKeyFile"];
 	    }
 	}
+	export class Setting {
+	    httpPort: number;
+	    httpsPort: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new Setting(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.httpPort = source["httpPort"];
+	        this.httpsPort = source["httpsPort"];
+	    }
+	}
 
 }
 

@@ -7,3 +7,7 @@ devWithBrowser:
 
 build:
 	wails build
+
+buildForWindows:
+	wails build -platform=windows -s
+

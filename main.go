@@ -3,18 +3,24 @@ package main
 import (
 	"context"
 	"embed"
-	"github.com/wailsapp/wails/v2/pkg/options/mac"
-	"localProxy/service"
-
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"localProxy/service"
+	"os"
 )
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func main() {
+	if len(os.Args) > 1 {
+		service.Init(context.Background())
+		service.HandleCommandLine()
+		return
+	}
+
 	// Create an instance of the app structure
 
 	// Create application with options
@@ -47,6 +53,7 @@ func main() {
 		Bind: []interface{}{
 			&service.Hosts{},
 			&service.Service{},
+			&service.Setting{},
 		},
 	})
 

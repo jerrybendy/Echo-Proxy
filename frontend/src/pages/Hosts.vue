@@ -3,9 +3,7 @@
     <div class="table-container" @click="onTableClick">
       <div class="toolbar">
         <NButton type="primary" size="small" @click="createEmptyHost"><NIcon><Add/></NIcon> Create</NButton>
-        <NMessageProvider>
-          <ServerStatusButton />
-        </NMessageProvider>
+        <ServerStatusButton />
       </div>
       <NDataTable
           :columns="columns"
@@ -31,7 +29,7 @@
 <script setup lang="ts">
 import {computed, h, onBeforeUnmount, onMounted, ref} from 'vue'
 import {service} from "../../wailsjs/go/models";
-import {DataTableColumn, NButton, NCheckbox, NDataTable, NIcon, NDrawer, NMessageProvider} from "naive-ui";
+import {DataTableColumn, NButton, NCheckbox, NDataTable, NIcon, NDrawer} from "naive-ui";
 import {Add} from "@vicons/ionicons5";
 import {GetHosts} from "../../wailsjs/go/service/Hosts";
 import HostsSettings from "./HostsSettings.vue";
