@@ -6,12 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cast"
-	"log"
 	"net"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
-	"strings"
 	"sync"
 	"time"
 )
@@ -19,13 +15,11 @@ import (
 type Service struct {
 	httpServerRunning bool
 	tlsServerRunning  bool
-	// Host-to-host map for default targets
-	targetMap map[string]*url.URL
 
 	httpServer *http.Server
 	tlsServer  *http.Server
 
-	proxy *httputil.ReverseProxy
+	proxyCore *ProxyCore
 }
 
 func (s *Service) StartServer() bool {
@@ -35,26 +29,8 @@ func (s *Service) StartServer() bool {
 		}
 	}()
 
-	s.makeTargetMap()
-
-	s.proxy = &httputil.ReverseProxy{
-		Rewrite: nil,
-		Director: func(req *http.Request) {
-			hostName := strings.ToLower(req.Host)
-			log.Println("Host name is " + hostName)
-			target, ok := s.targetMap[hostName]
-			if ok {
-				req.URL.Scheme = target.Scheme
-				req.URL.Host = target.Host
-			}
-		},
-		ModifyResponse: nil,
-		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
-			w.WriteHeader(502)
-			html := fmt.Sprintf("<div style=\"text-align: center\"><h2>Bad Gateway</h2><p>%s</p>", err.Error())
-			_, _ = w.Write([]byte(html))
-		},
-	}
+	s.proxyCore = NewProxyCore()
+	s.proxyCore.SetRulesMap(s.makeRulesMap())
 
 	wg := &sync.WaitGroup{}
 	wg.Add(2)
@@ -130,16 +106,12 @@ func (s *Service) loadTLSConfig() *tls.Config {
 	return tlsConfig
 }
 
-func (s *Service) makeTargetMap() {
-	s.targetMap = make(map[string]*url.URL)
+func (s *Service) makeRulesMap() map[string][]*HostProxy {
+	result := make(map[string][]*HostProxy)
 	for _, h := range config.Hosts {
-		if h.DefaultTarget != "" {
-			u, err := url.Parse(h.DefaultTarget)
-			if err == nil {
-				s.targetMap[h.Name] = u
-			}
-		}
+		result[h.Name] = h.Proxies
 	}
+	return result
 }
 
 func (s *Service) startHttpServer(wg *sync.WaitGroup) {
@@ -148,7 +120,7 @@ func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
-		Handler:        s.proxy,
+		Handler:        s.proxyCore,
 	}
 
 	listener, err := net.Listen("tcp", s.httpServer.Addr)
@@ -181,7 +153,7 @@ func (s *Service) startTlsServer(wg *sync.WaitGroup) {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
-		Handler:        s.proxy,
+		Handler:        s.proxyCore,
 	}
 	listener, err := tls.Listen("tcp", s.tlsServer.Addr, tlsConfig)
 	if err != nil {

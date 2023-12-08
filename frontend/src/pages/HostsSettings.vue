@@ -1,5 +1,11 @@
 <template>
   <NDrawerContent title="Edit" closable :native-scrollbar="false" footer-style="justify-content: flex-start">
+<!--    <NTabs type="line" animated default-value="basic">-->
+<!--      <NTab name="basic" tab="Basic" />-->
+<!--      <NTab name="proxy" tab="Proxy" />-->
+<!--      <NTab name="ssl" tab="SSL" />-->
+<!--    </NTabs>-->
+
     <NForm
         ref="formRef"
         :model="model"
@@ -9,36 +15,46 @@
         require-mark-placement="right-hanging"
         size="small"
     >
-      <NCard title="Basic" size="small" :bordered="false">
+      <NCard id="basic" title="Basic" size="small" :bordered="false">
         <NFormItem label="Name" path="name">
-          <NInput v-model:value="model.name" placeholder="Domain name"/>
+          <NInput v-model:value="model.name" placeholder="www.example.com"/>
         </NFormItem>
         <NFormItem path="applyHosts">
           <NCheckbox v-model:checked="model.applyHosts">Apply to /etc/hosts file</NCheckbox>
         </NFormItem>
       </NCard>
 
-      <NCard title="Proxy" size="small" :bordered="false">
-        <NFormItem label="Default target" path="defaultTarget">
-          <NInput v-model:value="model.defaultTarget" placeholder="http://"/>
-        </NFormItem>
+      <NCard id="proxy" title="Proxies" size="small" :bordered="false">
+        <template #header-extra>
+          <NTooltip content-style="padding: 4px 6px; background: #262626; border-radius: 4px" raw>
+            <template #trigger>
+              <NButton quaternary size="tiny" @click="addProxy">
+                <template #icon><NIcon><Add /></NIcon></template>
+              </NButton>
+            </template>
+            <span style="font-size: 12px">Add proxy</span>
+          </NTooltip>
+        </template>
+        <ProxySettingCard
+            v-for="(proxy, index) in model.proxies" :key="proxy.id"
+            :proxy="proxy" :count="model.proxies.length" :index="index"
+            @moveUp="proxyMove(index, -1)" @moveDown="proxyMove(index, 1)" @remove="proxyMove(index, 0)"
+        />
       </NCard>
 
-      <NCard title="TLS" size="small" :bordered="false">
+      <NCard title="SSL" size="small" :bordered="false">
         <NFormItem path="enableTLS">
-          <NCheckbox v-model:checked="model.enableTLS">Enable TLS (HTTPS)</NCheckbox>
+          <NCheckbox v-model:checked="model.enableTLS">Enable SSL (HTTPS)</NCheckbox>
         </NFormItem>
-        <NFormItem label="Certificate file" path="TLSCertFile" :rule="{required: model.enableTLS, message: 'Certificate file is required'}">
+        <NFormItem label="Certificate" path="TLSCertFile" :rule="{required: model.enableTLS, message: 'Certificate file is required'}">
           <NButton :disabled="!model.enableTLS" @click="selectCertificateFile">Select file</NButton>
           <NText style="margin-left: 8px">{{ filename(model.TLSCertFile) }}</NText>
         </NFormItem>
-        <NFormItem label="Key file" path="TLSKeyFile" :rule="{required: model.enableTLS, message: 'Key file is required'}">
+        <NFormItem label="Key" path="TLSKeyFile" :rule="{required: model.enableTLS, message: 'Key file is required'}">
           <NButton :disabled="!model.enableTLS" @click="selectCertificateKeyFile">Select file</NButton>
           <NText style="margin-left: 8px">{{ filename(model.TLSKeyFile) }}</NText>
         </NFormItem>
       </NCard>
-
-
     </NForm>
 
     <template #footer>
@@ -58,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-  import {ref, readonly, watch} from 'vue'
+  import {ref, watch} from 'vue'
   import {
     FormRules,
     NCard,
@@ -72,10 +88,14 @@
     NPopconfirm,
     ButtonProps,
     NText,
+    NIcon,
+    NTooltip,
   } from 'naive-ui'
   import {service} from "../../wailsjs/go/models";
   import {OpenFileDialog, RemoveHost, SaveSetting} from "../../wailsjs/go/service/Hosts";
-
+  import {Add} from "@vicons/ionicons5";
+  import deepmerge from "deepmerge";
+  import ProxySettingCard from "../components/ProxySettingCard.vue";
 
   const props = defineProps<{
     host: service.HostConfig | null,
@@ -86,22 +106,34 @@
   }>()
 
   const formRef = ref<FormInst | null>(null)
-  const defaultConfig = readonly<service.HostConfig>({
+  const defaultConfig: Readonly<service.HostConfig> = service.HostConfig.createFrom({
     id: 0,
     name: '',
     applyHosts: false,
-    defaultTarget: '',
     enableTLS: false,
     TLSCertFile: '',
     TLSKeyFile: '',
+    proxies: [] as service.HostProxy[],
   })
-  const model = ref<service.HostConfig>(defaultConfig)
+  const defaultProxy: Readonly<service.HostProxy> = service.HostProxy.createFrom({
+    id: Date.now(),
+    matchType: "PREFIX",
+    matchRule: "/",
+    // matchParams: {} as service.HostMatchParams,
+    target: "",
+    changeOrigin: false,
+  })
+
+  const model = ref<service.HostConfig>(deepmerge({}, defaultConfig))
 
   watch<service.HostConfig | null, true>(() => props.host, (newValue) => {
     if (newValue) {
-      model.value = {...newValue}
+      model.value = deepmerge(defaultConfig, newValue)
     } else {
-      model.value = {...defaultConfig}
+      model.value = deepmerge({}, defaultConfig)
+    }
+    if (!model.value.proxies || !model.value.proxies.length) {
+      model.value.proxies = [deepmerge<service.HostProxy>(defaultProxy, {id: Date.now()})]
     }
   }, {immediate: true})
 
@@ -110,13 +142,9 @@
       {required: true, message: 'Domain name is required'},
       {pattern: /^[-a-z0-9]+(\.[-a-z0-9]+)*\.[a-zA-Z]{2,}$/i, message: 'Invalid domain name'},
     ],
-    defaultTarget: [
-      {
-        pattern: /^https?:\/\/(([a-zA-Z0-9_-])+(\.)?)*(:\d+)?(\/((\.)?(\?)?=?&?[a-zA-Z0-9_-](\?)?)*)*$/i,
-        message: 'Default target must be a valid URL'
-      },
-    ],
   })
+
+
 
   async function saveSetting(e: MouseEvent) {
     e.preventDefault()
@@ -153,8 +181,14 @@
   function filename(path: string): string {
     return path.substring(path.replace(/\\/g, '/').lastIndexOf('/') + 1)
   }
+
+  function addProxy() {
+    model.value.proxies.unshift(deepmerge<service.HostProxy>(defaultProxy, {id: Date.now()}))
+  }
+
+  function proxyMove(index: number, delta: number) {
+    const items = model.value.proxies.splice(index, 1)
+    delta !== 0 && model.value.proxies.splice(index + delta, 0, items[0])
+  }
+
 </script>
-
-<style scoped>
-
-</style>

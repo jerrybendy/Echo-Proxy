@@ -2,34 +2,41 @@ package service
 
 import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
+	"net/url"
 	"strings"
 	"time"
 )
 
 type HostConfig struct {
-	ID            int64  `json:"id"`
-	Name          string `json:"name"`
-	ApplyHosts    bool   `json:"applyHosts"`
-	DefaultTarget string `json:"defaultTarget"` // Proxy target for `/`
-	EnableTLS     bool   `json:"enableTLS"`
-	TLSCertFile   string `json:"TLSCertFile"`
-	TLSKeyFile    string `json:"TLSKeyFile"`
-	//Targets    []HostProxyTarget `json:"targets"`
+	ID          int64        `json:"id"`
+	Name        string       `json:"name"` // Domain name
+	ApplyHosts  bool         `json:"applyHosts"`
+	EnableTLS   bool         `json:"enableTLS"`
+	TLSCertFile string       `json:"TLSCertFile"`
+	TLSKeyFile  string       `json:"TLSKeyFile"`
+	Proxies     []*HostProxy `json:"proxies"`
 }
 
-//type HostProxyTarget struct {
-//	Filter     string     `json:"filter"`
-//	FilterType FilterType `json:"filterType"`
-//	Target     string     `json:"target"`
-//}
+type HostProxy struct {
+	ID        int64     `json:"id"`
+	MatchType MatchType `json:"matchType"`
+	MatchRule string    `json:"matchRule"`
+	//MatchParams struct {
+	//	CaseInsensitive bool `json:"caseInsensitive,omitempty"`
+	//} `json:"matchParams"`
+	Target       string `json:"target"`
+	ChangeOrigin bool   `json:"changeOrigin"`
+	targetUrl    *url.URL
+}
 
-//type FilterType string
-//
-//const (
-//	FilterTypePrefix FilterType = "PREFIX"
-//	FilterTypeRegexp            = "REGEXP"
-//	FilterTypeGlob              = "GLOB"
-//)
+type MatchType string
+
+const (
+	MatchTypePrefix MatchType = "PREFIX"
+	MatchTypeRegexp           = "REGEXP"
+	MatchTypeGlob             = "GLOB"
+	MatchTypeStatic           = "STATIC"
+)
 
 type Hosts struct {
 }

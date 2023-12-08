@@ -48,6 +48,17 @@ func removeHostsFileRecord() error {
 	if p, _ := isPrivileged(); p {
 		return removeHostsRecordCommand()
 	}
-	cmd := os.Args[0] + " removeHostsRecord"
-	return exec.Command("osascript", "-e", fmt.Sprintf("do shell script \"%s\" with administrator privileges", cmd)).Start()
+	// Only runs when ApplyHosts is enabled
+	isEnabled := false
+	for _, h := range config.Hosts {
+		if h.ApplyHosts {
+			isEnabled = true
+			break
+		}
+	}
+	if isEnabled {
+		cmd := os.Args[0] + " removeHostsRecord"
+		return exec.Command("osascript", "-e", fmt.Sprintf("do shell script \"%s\" with administrator privileges", cmd)).Start()
+	}
+	return nil
 }

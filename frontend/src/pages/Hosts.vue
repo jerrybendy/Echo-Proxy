@@ -44,10 +44,6 @@ const columns: DataTableColumn[] = [
     key: 'name',
   },
   {
-    title: 'Default target',
-    key: 'defaultTarget',
-  },
-  {
     title: 'hosts file',
     key: 'applyHosts',
     align: "center",

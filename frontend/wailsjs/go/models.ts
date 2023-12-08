@@ -1,13 +1,33 @@
 export namespace service {
 	
+	export class HostProxy {
+	    id: number;
+	    matchType: string;
+	    matchRule: string;
+	    target: string;
+	    changeOrigin: boolean;
+	
+	    static createFrom(source: any = {}) {
+	        return new HostProxy(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.matchType = source["matchType"];
+	        this.matchRule = source["matchRule"];
+	        this.target = source["target"];
+	        this.changeOrigin = source["changeOrigin"];
+	    }
+	}
 	export class HostConfig {
 	    id: number;
 	    name: string;
 	    applyHosts: boolean;
-	    defaultTarget: string;
 	    enableTLS: boolean;
 	    TLSCertFile: string;
 	    TLSKeyFile: string;
+	    proxies: HostProxy[];
 	
 	    static createFrom(source: any = {}) {
 	        return new HostConfig(source);
@@ -18,11 +38,29 @@ export namespace service {
 	        this.id = source["id"];
 	        this.name = source["name"];
 	        this.applyHosts = source["applyHosts"];
-	        this.defaultTarget = source["defaultTarget"];
 	        this.enableTLS = source["enableTLS"];
 	        this.TLSCertFile = source["TLSCertFile"];
 	        this.TLSKeyFile = source["TLSKeyFile"];
+	        this.proxies = this.convertValues(source["proxies"], HostProxy);
 	    }
+	
+		convertValues(a: any, classs: any, asMap: boolean = false): any {
+		    if (!a) {
+		        return a;
+		    }
+		    if (a.slice) {
+		        return (a as any[]).map(elem => this.convertValues(elem, classs));
+		    } else if ("object" === typeof a) {
+		        if (asMap) {
+		            for (const key of Object.keys(a)) {
+		                a[key] = new classs(a[key]);
+		            }
+		            return a;
+		        }
+		        return new classs(a);
+		    }
+		    return a;
+		}
 	}
 	export class Setting {
 	    httpPort: number;

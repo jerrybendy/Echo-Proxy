@@ -8,13 +8,14 @@ import (
 	"os"
 )
 
-const AppName = "Local Proxy"
+const AppName = "Echo Proxy"
 
 var configFilePath string
 
 var config *configFile
 
 type configFile struct {
+	Version string        `json:"version"`
 	Hosts   []*HostConfig `json:"hosts"`
 	Setting Setting       `json:"setting"`
 }
