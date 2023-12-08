@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/exec"
 	"os/user"
+	"strings"
 )
 
 func isPrivileged() (bool, error) {
@@ -38,7 +39,7 @@ func addHostsFileRecord() error {
 		}
 	}
 	if isEnabled {
-		cmd := os.Args[0] + " addHostsRecord"
+		cmd := strings.ReplaceAll(os.Args[0], " ", "\\\\ ") + " addHostsRecord"
 		return exec.Command("osascript", "-e", fmt.Sprintf("do shell script \"%s\" with administrator privileges", cmd)).Start()
 	}
 	return nil
@@ -57,7 +58,7 @@ func removeHostsFileRecord() error {
 		}
 	}
 	if isEnabled {
-		cmd := os.Args[0] + " removeHostsRecord"
+		cmd := strings.ReplaceAll(os.Args[0], " ", "\\\\ ") + " removeHostsRecord"
 		return exec.Command("osascript", "-e", fmt.Sprintf("do shell script \"%s\" with administrator privileges", cmd)).Start()
 	}
 	return nil

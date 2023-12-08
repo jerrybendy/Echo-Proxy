@@ -61,7 +61,7 @@ rulesLoop:
 			req.Header.Add("X-Forwarded-Proto", req.URL.Scheme)
 			req.Header.Add("X-Forwarded-Host", req.Host)
 
-			if !rule.ChangeOrigin {
+			if rule.ChangeOrigin {
 				req.Host = rule.targetUrl.Host
 			}
 
