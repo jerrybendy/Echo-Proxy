@@ -34,7 +34,7 @@ func Init(ctx context.Context) {
 	}
 
 	if configFilePath == "" {
-		configFilePath = configDir + string(os.PathSeparator) + "config.json"
+		configFilePath = configDir + string(os.PathSeparator) + "config-dev.json"
 	}
 
 	parseConfig()

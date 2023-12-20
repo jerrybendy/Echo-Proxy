@@ -1,41 +1,54 @@
 package service
 
 import (
-	"fmt"
+	"github.com/mitchellh/mapstructure"
+	"localProxy/utils"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"net/url"
 	"strings"
 )
 
 type ProxyCore struct {
-	proxy    *httputil.ReverseProxy
 	rulesMap map[string][]*HostProxy
 }
 
 func NewProxyCore() *ProxyCore {
 	core := new(ProxyCore)
-	core.proxy = &httputil.ReverseProxy{
-		Rewrite:        nil,
-		Director:       core.proxyDirector,
-		ModifyResponse: nil,
-		ErrorHandler: func(w http.ResponseWriter, r *http.Request, err error) {
-			w.WriteHeader(502)
-			html := fmt.Sprintf("<div style=\"text-align: center\"><h2>Bad Gateway</h2><p>%s</p>", err.Error())
-			_, _ = w.Write([]byte(html))
-		},
-	}
 
 	return core
 }
 
 func (p *ProxyCore) SetRulesMap(rules map[string][]*HostProxy) {
+	for _, p := range rules {
+		for _, rule := range p {
+			switch rule.TargetType {
+			case TargetTypeStatic:
+				t := StaticTarget{}
+				_ = mapstructure.Decode(rule.TargetParams, &t)
+				rule.targetObj = &t
+
+			case TargetTypeProxy:
+				t := ProxyTarget{}
+				_ = mapstructure.Decode(rule.TargetParams, &t)
+				rule.targetObj = &t
+			case TargetTypePHP:
+				t := PhpTarget{}
+				_ = mapstructure.Decode(rule.TargetParams, &t)
+				rule.targetObj = &t
+			default:
+				rule.targetObj = nil
+			}
+		}
+	}
 	p.rulesMap = rules
 }
 
-func (p *ProxyCore) proxyDirector(req *http.Request) {
-	hostName := strings.ToLower(req.Host)
+func (p *ProxyCore) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	hostName := strings.ToLower(r.Host)
+	if hostName == "" {
+		hostName = strings.ToLower(r.URL.Host)
+	}
 	log.Println("Host name is " + hostName)
 	rules, ok := p.rulesMap[hostName]
 	if !ok {
@@ -44,32 +57,15 @@ func (p *ProxyCore) proxyDirector(req *http.Request) {
 
 rulesLoop:
 	for _, rule := range rules {
-		if rule.targetUrl == nil {
-			u, err := url.Parse(rule.Target)
-			if err != nil {
-				// Ignore current rule when target is invalid
-				continue
+		if p.isRuleMatched(r.URL, rule) {
+			log.Printf("Rule matched, %s, %s\n", rule.TargetType, utils.JsonEncode(rule))
+
+			if rule.targetObj != nil {
+				rule.targetObj.ServeTarget(rule, w, r)
 			}
-			rule.targetUrl = u
-		}
-
-		if p.isRuleMatched(req.URL, rule) {
-			req.URL.Scheme = rule.targetUrl.Scheme
-			req.URL.Host = rule.targetUrl.Host
-
-			req.Header.Add("X-Forwarded-For", req.RemoteAddr)
-			req.Header.Add("X-Forwarded-Proto", req.URL.Scheme)
-			req.Header.Add("X-Forwarded-Host", req.Host)
-
-			if rule.ChangeOrigin {
-				req.Host = rule.targetUrl.Host
-			}
-
-			log.Println(req.URL.String())
 
 			break rulesLoop
 		}
-
 	}
 }
 
@@ -81,8 +77,4 @@ func (p *ProxyCore) isRuleMatched(url *url.URL, rule *HostProxy) bool {
 	default:
 		return false
 	}
-}
-
-func (p *ProxyCore) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	p.proxy.ServeHTTP(w, r)
 }

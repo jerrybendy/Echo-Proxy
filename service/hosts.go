@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -18,24 +17,29 @@ type HostConfig struct {
 }
 
 type HostProxy struct {
-	ID        int64     `json:"id"`
-	MatchType MatchType `json:"matchType"`
-	MatchRule string    `json:"matchRule"`
-	//MatchParams struct {
-	//	CaseInsensitive bool `json:"caseInsensitive,omitempty"`
-	//} `json:"matchParams"`
-	Target       string `json:"target"`
-	ChangeOrigin bool   `json:"changeOrigin"`
-	targetUrl    *url.URL
+	ID           int64          `json:"id"`
+	MatchType    MatchType      `json:"matchType"`
+	MatchRule    string         `json:"matchRule"`
+	MatchParams  map[string]any `json:"matchParams"`
+	TargetType   TargetType     `json:"targetType"`
+	TargetParams map[string]any `json:"targetParams"`
+	targetObj    TargetHandler
 }
 
 type MatchType string
+
+type TargetType string
 
 const (
 	MatchTypePrefix MatchType = "PREFIX"
 	MatchTypeRegexp           = "REGEXP"
 	MatchTypeGlob             = "GLOB"
-	MatchTypeStatic           = "STATIC"
+)
+
+const (
+	TargetTypeStatic TargetType = "STATIC"
+	TargetTypeProxy             = "PROXY"
+	TargetTypePHP               = "PHP"
 )
 
 type Hosts struct {

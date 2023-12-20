@@ -13,3 +13,11 @@ func FileExists(path string) bool {
 	// Omit other exception
 	return false
 }
+
+func IsDir(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return info.IsDir()
+}
