@@ -4,8 +4,9 @@ export namespace service {
 	    id: number;
 	    matchType: string;
 	    matchRule: string;
-	    target: string;
-	    changeOrigin: boolean;
+	    matchParams: {[key: string]: any};
+	    targetType: string;
+	    targetParams: {[key: string]: any};
 	
 	    static createFrom(source: any = {}) {
 	        return new HostProxy(source);
@@ -16,8 +17,9 @@ export namespace service {
 	        this.id = source["id"];
 	        this.matchType = source["matchType"];
 	        this.matchRule = source["matchRule"];
-	        this.target = source["target"];
-	        this.changeOrigin = source["changeOrigin"];
+	        this.matchParams = source["matchParams"];
+	        this.targetType = source["targetType"];
+	        this.targetParams = source["targetParams"];
 	    }
 	}
 	export class HostConfig {

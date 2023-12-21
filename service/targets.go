@@ -87,6 +87,9 @@ func (t *ProxyTarget) ServeTarget(rule *HostProxy, w http.ResponseWriter, r *htt
 func (p *PhpTarget) ServeTarget(rule *HostProxy, w http.ResponseWriter, r *http.Request) {
 	// init
 	if p.phpHandler == nil {
+		if p.FPMAddress == "" {
+			p.FPMAddress = "127.0.0.1:9000"
+		}
 		connFactory := gofast.SimpleConnFactory("tcp", p.FPMAddress)
 		sess := gofast.Chain(gofast.BasicParamsMap, gofast.MapHeader, gofast.MapRemoteHost)(gofast.BasicSession)
 

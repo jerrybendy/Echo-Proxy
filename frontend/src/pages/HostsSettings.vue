@@ -11,7 +11,7 @@
         :model="model"
         :rules="rules"
         label-placement="left"
-        label-width="auto"
+        label-width="120px"
         require-mark-placement="right-hanging"
         size="small"
     >
@@ -119,9 +119,8 @@
     id: Date.now(),
     matchType: "PREFIX",
     matchRule: "/",
-    // matchParams: {} as service.HostMatchParams,
-    target: "",
-    changeOrigin: false,
+    targetType: "PROXY",
+    targetParams: {},
   })
 
   const model = ref<service.HostConfig>(deepmerge({}, defaultConfig))

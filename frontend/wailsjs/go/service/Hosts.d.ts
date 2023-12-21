@@ -6,6 +6,8 @@ export function GetHosts():Promise<Array<service.HostConfig>>;
 
 export function OpenFileDialog(arg1:string,arg2:string,arg3:string):Promise<string>;
 
+export function OpenFolder(arg1:string):Promise<string>;
+
 export function RemoveHost(arg1:number):Promise<void>;
 
 export function SaveSetting(arg1:service.HostConfig):Promise<void>;

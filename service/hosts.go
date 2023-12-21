@@ -94,3 +94,16 @@ func (h *Hosts) OpenFileDialog(title, filterName, filterPattern string) string {
 	}
 	return file
 }
+
+func (h *Hosts) OpenFolder(title string) string {
+	file, err := runtime.OpenDirectoryDialog(runtimeCtx, runtime.OpenDialogOptions{
+		Title:                      title,
+		CanCreateDirectories:       true,
+		ResolvesAliases:            false,
+		TreatPackagesAsDirectories: false,
+	})
+	if err != nil {
+		return ""
+	}
+	return file
+}

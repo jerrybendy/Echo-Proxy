@@ -2,7 +2,6 @@ package service
 
 import (
 	"github.com/mitchellh/mapstructure"
-	"localProxy/utils"
 	"log"
 	"net/http"
 	"net/url"
@@ -58,7 +57,7 @@ func (p *ProxyCore) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 rulesLoop:
 	for _, rule := range rules {
 		if p.isRuleMatched(r.URL, rule) {
-			log.Printf("Rule matched, %s, %s\n", rule.TargetType, utils.JsonEncode(rule))
+			//log.Printf("Rule matched, %s, %s\n", rule.TargetType, utils.JsonEncode(rule))
 
 			if rule.targetObj != nil {
 				rule.targetObj.ServeTarget(rule, w, r)

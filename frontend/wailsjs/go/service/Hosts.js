@@ -10,6 +10,10 @@ export function OpenFileDialog(arg1, arg2, arg3) {
   return window['go']['service']['Hosts']['OpenFileDialog'](arg1, arg2, arg3);
 }
 
+export function OpenFolder(arg1) {
+  return window['go']['service']['Hosts']['OpenFolder'](arg1);
+}
+
 export function RemoveHost(arg1) {
   return window['go']['service']['Hosts']['RemoveHost'](arg1);
 }

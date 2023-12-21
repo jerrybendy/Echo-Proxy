@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/spf13/cast"
+	"log"
 	"net"
 	"net/http"
 	"sync"
@@ -116,7 +117,7 @@ func (s *Service) makeRulesMap() map[string][]*HostProxy {
 
 func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 	s.httpServer = &http.Server{
-		Addr:           ":" + cast.ToString(config.Setting.HttpPort),
+		Addr:           ":" + cast.ToString(config.Setting.GetSettings().HttpPort),
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -130,6 +131,7 @@ func (s *Service) startHttpServer(wg *sync.WaitGroup) {
 		return
 	}
 	s.httpServerRunning = true
+	log.Printf("HTTP server is started at %s\n", s.httpServer.Addr)
 	wg.Done()
 	err = s.httpServer.Serve(listener)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -148,7 +150,7 @@ func (s *Service) startTlsServer(wg *sync.WaitGroup) {
 	}
 
 	s.tlsServer = &http.Server{
-		Addr:           ":" + cast.ToString(config.Setting.HttpsPort),
+		Addr:           ":" + cast.ToString(config.Setting.GetSettings().HttpsPort),
 		TLSConfig:      tlsConfig,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
@@ -162,6 +164,7 @@ func (s *Service) startTlsServer(wg *sync.WaitGroup) {
 		return
 	}
 	s.tlsServerRunning = true
+	log.Printf("HTTPS server is started at %s\n", s.tlsServer.Addr)
 	wg.Done()
 	err = s.tlsServer.Serve(listener)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
