@@ -19,3 +19,6 @@ buildForDarwinArm64:
 
 buildForDarwinAmd64:
 	wails build -platform=darwin/amd64 -s -m -trimpath -o EchoProxy_darwin_amd64.app
+
+buildForDarwinUniversal:
+	wails build -platform=darwin/universal -s -m -trimpath -o EchoProxy_darwin_amd64.app
