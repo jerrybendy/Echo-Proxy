@@ -16,13 +16,22 @@
           v-model:collapsed="menuCollapsed"
           @update:collapsed="onMenuCollapsedChange"
       >
-        <NMenu
-            :value="currentMenu"
-            :collapsed-width="64"
-            :collapsed-icon-size="22"
-            :collapsed="menuCollapsed"
-            :options="menuOptions"
-        />
+        <NSpace vertical justify="space-between" style="height: 100%">
+          <NMenu
+              :value="currentMenu"
+              :collapsed-width="64"
+              :collapsed-icon-size="22"
+              :collapsed="menuCollapsed"
+              :options="menuOptions"
+          />
+          <NMenu
+              :value="currentMenu"
+              :collapsed-width="64"
+              :collapsed-icon-size="22"
+              :collapsed="menuCollapsed"
+              :options="cornerMenuOptions"
+          />
+        </NSpace>
       </NLayoutSider>
 
       <NLayout :native-scrollbar="false" style="height: 100%">
@@ -48,12 +57,14 @@
     NNotificationProvider,
     NLayout,
     NLayoutSider,
+    NSpace,
     NMenu,
     MenuOption,
+    MenuDividerOption,
     NMessageProvider
   } from "naive-ui"
   import Hosts from "./pages/Hosts.vue";
-  import {Home, SettingsSharp} from "@vicons/ionicons5"
+  import {Home, SettingsSharp, InformationCircle} from "@vicons/ionicons5"
   import GlobalEvents from "./components/GlobalEvents.vue";
 
   const osThemeRef = useOsTheme()
@@ -74,7 +85,7 @@
     currentMenu.value = newRoute.name as string || ''
   }, {immediate: true})
 
-  const menuOptions: MenuOption[] = [
+  const menuOptions: Array<MenuOption | MenuDividerOption> = [
     {
       label: () => h(RouterLink, {to: {name: 'Hosts'}}, {default: () => 'Hosts'}),
       key: 'Hosts',
@@ -84,6 +95,14 @@
       label: () => h(RouterLink, {to: {name: 'Settings'}}, {default: () => 'Settings'}),
       key: 'Settings',
       icon: renderIcon(SettingsSharp)
+    },
+  ]
+
+  const cornerMenuOptions: MenuOption[] = [
+    {
+      label: () => h(RouterLink, {to: {name: 'About'}}, {default: () => 'About'}),
+      key: 'About',
+      icon: renderIcon(InformationCircle),
     },
   ]
 

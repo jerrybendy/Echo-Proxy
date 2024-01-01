@@ -1,6 +1,7 @@
 import {createRouter, createWebHashHistory, RouteRecordRaw} from "vue-router";
 import Hosts from "./pages/Hosts.vue";
 import Settings from "./pages/Settings.vue";
+import About from "./pages/About.vue";
 
 const routes: RouteRecordRaw[] = [
     {
@@ -16,6 +17,11 @@ const routes: RouteRecordRaw[] = [
         path: '/settings',
         name: 'Settings',
         component: Settings,
+    },
+    {
+        path: '/about',
+        name: 'About',
+        component: About,
     },
 ]
 
