@@ -14,7 +14,7 @@
     "companyName": "icewingcc",
     "productName": "Echo Proxy",
     "productVersion": "0.2.0",
-    "copyright": "© 2023 Jerry Bendy",
+    "copyright": "©2023-2024 Jerry Bendy",
     "comments": "A local reverse proxy tool"
   }
 }

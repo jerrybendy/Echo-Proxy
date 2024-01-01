@@ -8,17 +8,18 @@ devWithBrowser:
 build:
 	wails build
 
+buildFrontend:
+	cd frontend
+	npm run build
+
 buildForWindows:
-	wails build -platform=windows/amd64 -s -m -trimpath -o EchoProxy_windows_amd64.exe
-
-buildForWindowsArm64:
-	wails build -platform=windows/arm64 -s -m -trimpath -o EchoProxy_windows_arm64.exe
-
-buildForDarwinArm64:
-	wails build -platform=darwin/arm64 -s -m -trimpath -o EchoProxy_darwin_arm64.app
-
-buildForDarwinAmd64:
-	wails build -platform=darwin/amd64 -s -m -trimpath -o EchoProxy_darwin_amd64.app
+	wails build -platform=windows/amd64 -s -m -trimpath -o EchoProxy.exe
+	cd build/bin
+	zip EchoProxy_windows_amd64.zip EchoProxy.exe
+	rm -rf EchoProxy.exe
 
 buildForDarwinUniversal:
-	wails build -platform=darwin/universal -s -m -trimpath -o EchoProxy_darwin_amd64.app
+	wails build -platform=darwin/universal -s -m -trimpath
+	cd build/bin
+	zip -r EchoProxy_darwin_universal.zip "./Echo Proxy.app"
+	rm -rf "Echo Proxy.app"
