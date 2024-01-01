@@ -32,6 +32,7 @@ const loading = ref(false)
 const serverStatus = ref<serverStatusType>({} as serverStatusType)
 
 onMounted(() => {
+  refreshServerStatus()
   refreshStatusTimer.value = setInterval(refreshServerStatus, 1000)
 })
 
