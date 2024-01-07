@@ -1,19 +1,14 @@
-# README
+# Echo Proxy
 
-## About
+Echo Proxy is a proxy tool for local development. It can map the IP+Port to local domain, and make the domain-depended development easier.
 
-This is the official Wails Vue-TS template.
+Usually you can use Apache or Nginx to do the same thing, but the installation and configuration of these are difficult, especially when you need use PHP environment. Echo Proxy makes these operation easier. You only need to add your domains and expected proxy rules, and press *Start server*, all things will be done automatically.
 
-You can configure the project by editing `wails.json`. More information about the project settings can be found
-here: https://wails.io/docs/reference/project-config
+** Features
+* HTTP/HTTPS reverse proxy
+* Static file server
+* PHP proxy (based on fast-cgi)
+* Automatic manage hosts files
+* Ruled proxy (based on prefix, regular expression and glob mode)
+* Multiple rules supported
 
-## Live Development
-
-To run in live development mode, run `wails dev` in the project directory. This will run a Vite development
-server that will provide very fast hot reload of your frontend changes. If you want to develop in a browser
-and have access to your Go methods, there is also a dev server that runs on http://localhost:34115. Connect
-to this in your browser, and you can call your Go code from devtools.
-
-## Building
-
-To build a redistributable, production mode package, use `wails build`.
